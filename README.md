@@ -10,7 +10,7 @@
 https://github.com/NeoFantom/quafu-quarkstudio-skill/tree/main/skills/en/quarkstudio
 如果我选择 中文，请使用 $skill-installer 从这个路径安装：
 https://github.com/NeoFantom/quafu-quarkstudio-skill/tree/main/skills/zh/quarkstudio
-安装完成后，请提醒我重启 Codex 以加载新 skill。
+如果本地已经安装了 quarkstudio skill，请先询问我是否替换；不要静默覆盖。安装完成后，请提醒我重启 Codex 以加载新 skill。
 ```
 
 ## English installation guide
@@ -23,7 +23,7 @@ If I choose English, use $skill-installer to install from this path:
 https://github.com/NeoFantom/quafu-quarkstudio-skill/tree/main/skills/en/quarkstudio
 If I choose 中文, use $skill-installer to install from this path:
 https://github.com/NeoFantom/quafu-quarkstudio-skill/tree/main/skills/zh/quarkstudio
-After installation, remind me to restart Codex so the new skill is loaded.
+If a quarkstudio skill is already installed locally, ask me before replacing it; do not overwrite silently. After installation, remind me to restart Codex so the new skill is loaded.
 ```
 
 ## Language-specific skill paths
