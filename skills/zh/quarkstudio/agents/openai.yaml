@@ -1,4 +1,0 @@
-interface:
-  display_name: "QuarkStudio / Quafu"
-  short_description: "注册、配置 token，并运行基础 Quafu 云任务"
-  default_prompt: "使用 $quarkstudio 检查我的 Quafu 注册状态，安全配置 token，并运行只读 QuarkStudio status check。"

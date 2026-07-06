@@ -1,0 +1,4 @@
+interface:
+  display_name: "BAQIS Quafu / QSteed"
+  short_description: "BAQIS Quafu jobs and QSteed compile"
+  default_prompt: "Use $baqis-quafu to configure Quafu safely, optionally enable QSteed, and write validated OpenQASM job code."

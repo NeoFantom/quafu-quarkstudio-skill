@@ -1,0 +1,4 @@
+interface:
+  display_name: "BAQIS Quafu / QSteed"
+  short_description: "BAQIS Quafu 任务与 QSteed 编译"
+  default_prompt: "使用 $baqis-quafu 安全配置 Quafu，可选启用 QSteed，并编写已验证的 OpenQASM 任务代码。"

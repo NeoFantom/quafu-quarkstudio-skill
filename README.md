@@ -1,48 +1,86 @@
-# Quafu QuarkStudio Skill
+# BAQIS Quafu Skill
 
-## 中文安装指南
+Cross-client Agent Skill for Quafu-SQC / QuarkStudio work: account/token setup, safe SDK checks, OpenQASM task code, result retrieval, and optional BAQIS QSteed compile/transpile support.
 
-复制下面整段给 Codex / ChatGPT agent：
+## Why this skill is more than setup
+
+The skill is designed so an agent can keep working after installation:
+
+- trigger on Quafu, QuarkStudio, QSteed, OpenQASM jobs, backend status, token setup, compile/transpile, and result retrieval;
+- read focused reference files only when needed;
+- run bundled helpers for redacted token storage, SDK smoke checks, optional QSteed setup, and local QSteed transpile validation;
+- write runnable code that loads tokens from approved local storage instead of hard-coding secrets;
+- block real hardware submission until the user authorizes the exact backend/circuit/shots/options.
+
+## Install prompts
+
+### Codex / ChatGPT agent
+
+Copy the full prompt below:
 
 ```text
-请帮我安装 Quafu QuarkStudio skill。先询问我语言选择：English | 中文。
-如果我选择 English，请使用 $skill-installer 从这个路径安装：
-https://github.com/NeoFantom/quafu-quarkstudio-skill/tree/main/skills/en/quarkstudio
-如果我选择 中文，请使用 $skill-installer 从这个路径安装：
-https://github.com/NeoFantom/quafu-quarkstudio-skill/tree/main/skills/zh/quarkstudio
-如果本地已经安装了 quarkstudio skill，请先询问我是否替换；不要静默覆盖。安装完成后，请提醒我重启 Codex 以加载新 skill。
-```
-
-## English installation guide
-
-Copy the full prompt below into Codex / ChatGPT agent:
-
-```text
-Please install the Quafu QuarkStudio skill for me. First ask me to choose a language: English | 中文.
+Please install the BAQIS Quafu skill for me. First ask me to choose a language: English | 中文.
 If I choose English, use $skill-installer to install from this path:
-https://github.com/NeoFantom/quafu-quarkstudio-skill/tree/main/skills/en/quarkstudio
+https://github.com/NeoFantom/quafu-skill/tree/main/skills/en/baqis-quafu
 If I choose 中文, use $skill-installer to install from this path:
-https://github.com/NeoFantom/quafu-quarkstudio-skill/tree/main/skills/zh/quarkstudio
-If a quarkstudio skill is already installed locally, ask me before replacing it; do not overwrite silently. After installation, remind me to restart Codex so the new skill is loaded.
+https://github.com/NeoFantom/quafu-skill/tree/main/skills/zh/baqis-quafu
+If a baqis-quafu skill or legacy quarkstudio skill is already installed locally, ask me before replacing it; do not overwrite silently.
+After installation, run the skill's first-run workflow: ask whether I have registered Quafu-SQC, configure/store my token only through the skill's safe helper, then ask whether I want optional BAQIS QSteed compiler/transpiler support. If I say yes to QSteed, show the helper dry run first and proceed only after I approve package installation and local QSteed config creation.
+After installation, remind me to restart the agent/client if required for skill discovery.
 ```
+
+### 中文安装提示
+
+```text
+请帮我安装 BAQIS Quafu skill。先询问我语言选择：English | 中文。
+如果我选择 English，请使用 $skill-installer 从这个路径安装：
+https://github.com/NeoFantom/quafu-skill/tree/main/skills/en/baqis-quafu
+如果我选择 中文，请使用 $skill-installer 从这个路径安装：
+https://github.com/NeoFantom/quafu-skill/tree/main/skills/zh/baqis-quafu
+如果本地已经安装了 baqis-quafu skill 或旧版 quarkstudio skill，请先询问我是否替换；不要静默覆盖。
+安装后运行该 skill 的 first-run workflow：询问我是否已注册 Quafu-SQC；只通过 skill 的安全 helper 配置/保存 token；然后询问我是否要启用北京量子院 BAQIS QSteed 编译/transpiler 支持。如果我选择启用 QSteed，先展示 helper dry run，只有我同意安装包并创建本地 QSteed 配置后再继续。
+安装完成后提醒我按客户端需要重启 agent/client 以加载新 skill。
+```
+
+## Client compatibility
+
+| Client | Use |
+|---|---|
+| Codex / Agent Skills clients | Install a folder containing `SKILL.md` plus helpers/reference files. |
+| Claude custom skills | Upload/package the skill folder; `skill.md` is included as a byte-for-byte mirror for Claude compatibility. |
+| opencode / Cursor | Use the Agent Skills-compatible folder if the client supports skills; otherwise copy the folder into the client's configured skills directory and restart/reload. |
+
+Each skill folder contains both `SKILL.md` and `skill.md`. Keep them synchronized when editing.
 
 ## Language-specific skill paths
 
 | Language | GitHub path | Installed skill name |
 |---|---|---|
-| English | `skills/en/quarkstudio` | `$quarkstudio` |
-| 中文 | `skills/zh/quarkstudio` | `$quarkstudio` |
+| English | `skills/en/baqis-quafu` | `$baqis-quafu` |
+| 中文 | `skills/zh/baqis-quafu` | `$baqis-quafu` |
 
-The legacy root path `quarkstudio/` is kept as an English compatibility alias. New installs should use one of the language-specific paths above.
+The root path `baqis-quafu/` is kept as an English compatibility alias. New installs should use one of the language-specific paths above.
 
-## What this skill does
+## Optional QSteed support
 
-- First asks whether the user has registered a Quafu-SQC account.
-- If not registered, guides the user to the registration walkthrough screenshot: <https://neofantom.github.io/quafu-lesson1/assets/screenshots/00-register.png>.
-- After registration, asks for an API token or, with explicit user permission, opens the Quafu-SQC login page and retrieves the token from an authenticated browser session via opencli.
-- Stores tokens locally without printing them, defaulting to `$XDG_CONFIG_HOME/quarkstudio/credentials.env` or `~/.config/quarkstudio/credentials.env` with restrictive permissions; optional per-project storage uses a git-ignored `.env.local`.
-- Supports basic QuarkStudio tasks only: install/import checks, backend status, OpenQASM 2.0 task dictionaries, submission gate, and result retrieval.
+QSteed is opt-in because it installs extra Python packages and may create `~/QSteed/config.ini`.
+
+Validated local flow in this repository:
+
+```bash
+python helpers/qsteed_setup.py          # dry run
+python helpers/qsteed_setup.py --yes    # after user approval
+```
+
+The helper creates an isolated Python 3.10/3.11 venv and installs the locally validated pins:
+
+```text
+pyquafu==0.4.1
+qsteed==0.2.2
+```
+
+Then it runs `helpers/qsteed_smoke.py --check-import --transpile-demo`, which performs only local checks: no Quafu token, no network call, no hardware submission.
 
 ## Safety scope
 
-No real API token is included in this repository. The skill is standalone and does not assume any private project path, registry, or local secrets convention. It forbids printing credentials and forbids submitting real hardware jobs without explicit current authorization.
+No real API token is included in this repository. The skill forbids printing credentials and forbids submitting real hardware jobs without explicit current authorization.
