@@ -40,9 +40,9 @@ The legacy root path `quarkstudio/` is kept as an English compatibility alias. N
 - First asks whether the user has registered a Quafu-SQC account.
 - If not registered, guides the user to the registration walkthrough screenshot: <https://neofantom.github.io/quafu-lesson1/assets/screenshots/00-register.png>.
 - After registration, asks for an API token or, with explicit user permission, opens the Quafu-SQC login page and retrieves the token from an authenticated browser session via opencli.
-- Stores tokens locally without printing them, defaulting to `~/.config/quarkstudio/credentials.env` with restrictive permissions.
+- Stores tokens locally without printing them, defaulting to `$XDG_CONFIG_HOME/quarkstudio/credentials.env` or `~/.config/quarkstudio/credentials.env` with restrictive permissions; optional per-project storage uses a git-ignored `.env.local`.
 - Supports basic QuarkStudio tasks only: install/import checks, backend status, OpenQASM 2.0 task dictionaries, submission gate, and result retrieval.
 
 ## Safety scope
 
-No real API token is included in this repository. The skill forbids printing credentials and forbids submitting real hardware jobs without explicit current authorization.
+No real API token is included in this repository. The skill is standalone and does not assume any private project path, registry, or local secrets convention. It forbids printing credentials and forbids submitting real hardware jobs without explicit current authorization.

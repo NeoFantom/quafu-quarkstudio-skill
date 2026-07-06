@@ -6,32 +6,38 @@ import argparse
 import os
 from pathlib import Path
 
-DEFAULT_ENV_PATH = Path.home() / ".config" / "quarkstudio" / "credentials.env"
+
+def default_user_env_path() -> Path:
+    base = os.environ.get("XDG_CONFIG_HOME")
+    if base:
+        return Path(base).expanduser() / "quarkstudio" / "credentials.env"
+    return Path.home() / ".config" / "quarkstudio" / "credentials.env"
 
 
-def load_env_token(path: Path = DEFAULT_ENV_PATH) -> str:
-    if os.environ.get("QUAFU_API_TOKEN"):
-        return os.environ["QUAFU_API_TOKEN"].strip()
+DEFAULT_ENV_PATH = default_user_env_path()
+
+
+def load_env_token(path: Path) -> str:
     path = path.expanduser()
-    if path.exists():
-        for line in path.read_text(encoding="utf-8").splitlines():
-            if line.startswith("QUAFU_API_TOKEN="):
-                return line.split("=", 1)[1].strip()
+    if not path.exists():
+        return ""
+    for line in path.read_text(encoding="utf-8").splitlines():
+        if line.startswith("QUAFU_API_TOKEN="):
+            return line.split("=", 1)[1].strip()
     return ""
 
 
-def load_project_token(project_root: Path, secret_key: str) -> str:
-    secrets_path = project_root / "secrets.yaml"
-    if not secrets_path.exists():
-        return ""
-    try:
-        import yaml  # type: ignore
-    except Exception:
-        return ""
-    data = yaml.safe_load(secrets_path.read_text(encoding="utf-8")) or {}
-    entry = data.get(secret_key) or {}
-    if isinstance(entry, dict):
-        return str(entry.get("key") or "").strip()
+def load_token(args: argparse.Namespace) -> str:
+    if os.environ.get("QUAFU_API_TOKEN"):
+        return os.environ["QUAFU_API_TOKEN"].strip()
+    token = load_env_token(args.env_path)
+    if token:
+        return token
+    project_env_path = args.project_env_path
+    if not project_env_path and args.project_root:
+        project_env_path = args.project_root / ".env.local"
+    if project_env_path:
+        return load_env_token(project_env_path)
     return ""
 
 
@@ -48,9 +54,9 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Run safe QuarkStudio smoke checks.")
     parser.add_argument("--check-import", action="store_true", help="Import quark.Task only; no token/network.")
     parser.add_argument("--status", action="store_true", help="Call tmgr.status() using an approved stored token.")
-    parser.add_argument("--env-path", type=Path, default=DEFAULT_ENV_PATH)
-    parser.add_argument("--project-root", type=Path)
-    parser.add_argument("--secret-key", default="baqis-quafu")
+    parser.add_argument("--env-path", type=Path, default=DEFAULT_ENV_PATH, help="User-level credentials.env path.")
+    parser.add_argument("--project-root", type=Path, help="Optional root containing a .env.local project token file.")
+    parser.add_argument("--project-env-path", type=Path, help="Optional explicit project dotenv path.")
     args = parser.parse_args()
 
     if not args.check_import and not args.status:
@@ -58,11 +64,9 @@ def main() -> int:
 
     Task = import_task()
     if args.status:
-        token = load_env_token(args.env_path)
-        if not token and args.project_root:
-            token = load_project_token(args.project_root, args.secret_key)
+        token = load_token(args)
         if not token:
-            raise SystemExit("FAIL status: no token found in QUAFU_API_TOKEN, user env file, or supplied project secrets. Token value not printed.")
+            raise SystemExit("FAIL status: no token found in QUAFU_API_TOKEN, user env file, or supplied project .env.local. Token value not printed.")
         try:
             tmgr = Task(token)
             status = tmgr.status()

@@ -2,11 +2,11 @@
 
 ## Source-backed facts
 
-- `[DURABLE]` A Quafu-SQC account must exist before token setup. If the user is not registered, guide them to the registration screenshot: <https://neofantom.github.io/quafu-lesson1/assets/screenshots/00-register.png>. Confirmation: project lesson asset supplied by the user; confidence: project walkthrough asset.
-- `[DURABLE]` QuarkStudio initializes with `from quark import Task` and `Task("token")`. Confirmation: Quafu-SQC official docs snapshot summarized in `platform-info.md`; confidence: doc snapshot.
-- `[DURABLE]` The official lesson states a token expires after 30 days and should be requested again after expiry. Confirmation: Quafu-SQC official docs snapshot summarized in `platform-info.md`; confidence: doc snapshot.
-- `[DURABLE]` The Quafu-SQC UI has an authenticated `GET /api/api-token` response field named `api_token`, a `POST /api/api-token` refresh path, and `GET /api/api-token-expiration`; requests use browser credentials. Confirmation: console UI bundle snapshot; confidence: UI bundle snapshot.
-- `[DURABLE]` Login uses `/api/token` from a form flow with reCAPTCHA/slider branches. Confirmation: console login bundle snapshot; confidence: UI bundle snapshot. Therefore agents must not automate password entry; let the user log in.
+- `[DURABLE]` A Quafu-SQC account must exist before token setup. If the user is not registered, guide them to the public registration screenshot: <https://neofantom.github.io/quafu-lesson1/assets/screenshots/00-register.png>. Confidence: public walkthrough asset.
+- `[DURABLE]` QuarkStudio initializes with `from quark import Task` and `Task("token")`. Confirmation: Quafu-SQC public documentation summarized in `platform-info.md`; confidence: public docs.
+- `[DURABLE]` The official lesson states a token expires after 30 days and should be requested again after expiry. Confirmation: Quafu-SQC public documentation summarized in `platform-info.md`; confidence: public docs.
+- `[DURABLE]` The Quafu-SQC UI has an authenticated `GET /api/api-token` response field named `api_token`, a `POST /api/api-token` refresh path, and `GET /api/api-token-expiration`; requests use browser credentials. Confirmation: console behavior snapshot; confidence: UI behavior snapshot.
+- `[DURABLE]` Login uses `/api/token` from a form flow that may include anti-bot checks. Confirmation: console login behavior snapshot; confidence: UI behavior snapshot. Therefore agents must not automate password entry; let the user log in.
 
 ## First-run decision tree
 
@@ -33,16 +33,16 @@ Then tell the user to log in manually. Do not fill username/password yourself.
 7. After the user says they are logged in, retrieve and store without printing the token:
 
 ```bash
-python .claude/skills/quarkstudio/helpers/retrieve_token_opencli.py --session quafu-token --store user-env
+python helpers/retrieve_token_opencli.py --session quafu-token --store user-env
 ```
 
-Use `--store project-secrets --project-root <repo>` only if the user explicitly chooses project `secrets.yaml`.
+Use `--store project-env --project-root PATH` only if the user explicitly chooses per-project dotenv storage.
 
 ## Storage destinations
 
-### Default: user env file
+### Default: XDG user config file
 
-`~/.config/quarkstudio/credentials.env`
+`$XDG_CONFIG_HOME/quarkstudio/credentials.env`, falling back to `~/.config/quarkstudio/credentials.env`.
 
 The helper writes:
 
@@ -52,16 +52,15 @@ QUAFU_API_TOKEN=<redacted-secret-value>
 
 with directory mode `0700` and file mode `0600`. Future agents can load it with shell or Python dotenv-style parsing.
 
-### Explicit project option: `secrets.yaml`
+### Explicit project option: `.env.local`
 
-Only use this when the user chooses project-level storage. The helper writes under top-level key `baqis-quafu` by default:
+Only use this when the user chooses per-project storage. The helper writes or updates:
 
-```yaml
-baqis-quafu:
-  key: <redacted-secret-value>
+```bash
+QUAFU_API_TOKEN=<redacted-secret-value>
 ```
 
-The helper preserves other keys when PyYAML is available. It refuses to print the token.
+in `.env.local` under the selected project root, with file mode `0600`. If the selected root is a git repository, the helper refuses to write `.env.local` unless git ignores it, because project-local secrets must not be committed. Add `.env.local` to `.gitignore`, choose `user-env`, or intentionally pass `--allow-unignored-project-env` after explaining the risk.
 
 ## Token hygiene checklist
 

@@ -43,13 +43,11 @@ def run_opencli_eval(session: str) -> dict:
     cmd = ["opencli", "browser", session, "eval", JS]
     proc = subprocess.run(cmd, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False)
     if proc.returncode != 0:
-        # stderr may include browser details, but not expected token; still keep concise.
         raise SystemExit(f"opencli eval failed with exit {proc.returncode}. Make sure the session is logged in and bound/open.")
     text = proc.stdout.strip()
     try:
         return json.loads(text)
     except json.JSONDecodeError:
-        # Some opencli versions wrap output; try to recover the last JSON object.
         start = text.rfind("{")
         if start >= 0:
             try:
@@ -61,24 +59,25 @@ def run_opencli_eval(session: str) -> dict:
 
 def store_token(token: str, args: argparse.Namespace) -> None:
     cmd = [sys.executable, str(STORE_HELPER), "--destination", args.store, "--token-stdin"]
-    if args.store == "project-secrets":
-        cmd += ["--project-root", str(args.project_root), "--secret-key", args.secret_key]
-    elif args.path:
+    if args.store == "project-env":
+        cmd += ["--project-root", str(args.project_root)]
+        if args.allow_unignored_project_env:
+            cmd += ["--allow-unignored-project-env"]
+    if args.path:
         cmd += ["--path", str(args.path)]
     proc = subprocess.run(cmd, input=token, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False)
     if proc.returncode != 0:
         raise SystemExit(proc.stderr.strip() or proc.stdout.strip() or "Token storage failed.")
-    # store_token.py output is designed to be redacted.
     print(proc.stdout.strip())
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Retrieve Quafu API token from logged-in browser and store it redacted.")
     parser.add_argument("--session", default="quafu-token", help="opencli browser session name.")
-    parser.add_argument("--store", choices=["user-env", "project-secrets"], default="user-env")
-    parser.add_argument("--path", type=Path, help="Optional user-env destination path.")
+    parser.add_argument("--store", choices=["user-env", "project-env"], default="user-env")
+    parser.add_argument("--path", type=Path, help="Optional destination path.")
     parser.add_argument("--project-root", type=Path, default=Path.cwd())
-    parser.add_argument("--secret-key", default="baqis-quafu")
+    parser.add_argument("--allow-unignored-project-env", action="store_true")
     args = parser.parse_args()
 
     data = run_opencli_eval(args.session)
