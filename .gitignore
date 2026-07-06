@@ -3,5 +3,5 @@ __pycache__/
 *.pyo
 .DS_Store
 .env
+.env.local
 credentials.env
-secrets.yaml

@@ -70,9 +70,27 @@ def _write_env_token(path: Path, token: str, *, private_parent: bool) -> None:
     _chmod_private_file(path)
 
 
-def _git_root(path: Path) -> Path | None:
+def _absolute_unresolved(path: Path) -> Path:
+    path = path.expanduser()
+    if not path.is_absolute():
+        path = Path.cwd() / path
+    return path.resolve(strict=False)
+
+
+def _nearest_existing_ancestor(path: Path) -> Path:
+    target = _absolute_unresolved(path)
+    if target.exists():
+        return target if target.is_dir() else target.parent
+    for candidate in target.parents:
+        if candidate.exists():
+            return candidate
+    return Path.cwd()
+
+
+def _git_root_for_target(path: Path) -> Path | None:
+    start = _nearest_existing_ancestor(path)
     proc = subprocess.run(
-        ["git", "-C", str(path), "rev-parse", "--show-toplevel"],
+        ["git", "-C", str(start), "rev-parse", "--show-toplevel"],
         text=True,
         stdout=subprocess.PIPE,
         stderr=subprocess.DEVNULL,
@@ -80,15 +98,16 @@ def _git_root(path: Path) -> Path | None:
     )
     if proc.returncode != 0:
         return None
-    return Path(proc.stdout.strip())
+    return Path(proc.stdout.strip()).resolve(strict=False)
 
 
 def _is_git_ignored(path: Path) -> bool:
-    root = _git_root(path.parent)
+    target = _absolute_unresolved(path)
+    root = _git_root_for_target(target)
     if root is None:
         return True
     try:
-        rel = path.resolve().relative_to(root.resolve())
+        rel = target.relative_to(root)
     except ValueError:
         return True
     proc = subprocess.run(
