@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BAQIS Quafu Skill｜组会展示</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Source+Serif+4:opsz,wght@8..60,300;8..60,400;8..60,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <style>
+    :root {
+      --bg: #FDF8F0;
+      --surface: #F5EDE0;
+      --ink: #2C2416;
+      --ink-light: #5C4F3D;
+      --ink-faint: #8C7E6C;
+      --sage: #6B8F71;
+      --sage-light: #D4E4D6;
+      --terracotta: #C47D5A;
+      --terracotta-light: #F2DDD0;
+      --slate: #5A6875;
+      --slate-light: #D8DEE4;
+      --code-bg: #2C2416;
+      --code-fg: #F0E8DA;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: radial-gradient(circle at 20% 0%, rgba(196,125,90,0.08), transparent 34%), var(--bg);
+      color: var(--ink);
+      font-family: 'Source Serif 4', Georgia, serif;
+      font-size: 17px;
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+    .page { max-width: 900px; margin: 0 auto; padding: 60px 32px 120px; }
+    .eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--terracotta);
+      letter-spacing: 1.6px;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(40px, 7vw, 68px);
+      font-weight: 700;
+      line-height: 1.05;
+      letter-spacing: -1.8px;
+      margin-bottom: 18px;
+    }
+    .subtitle {
+      font-size: 20px;
+      color: var(--ink-light);
+      margin-bottom: 36px;
+      font-weight: 300;
+      max-width: 760px;
+    }
+    .hero-card {
+      background: linear-gradient(135deg, var(--surface), #fff7ed);
+      border: 1px solid rgba(92,79,61,0.12);
+      border-radius: 18px;
+      padding: 26px;
+      margin: 28px 0 48px;
+      box-shadow: 0 20px 70px rgba(44,36,22,0.08);
+    }
+    .hero-card strong { color: var(--terracotta); }
+    h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 32px;
+      font-weight: 700;
+      margin: 58px 0 22px;
+      padding-top: 34px;
+      border-top: 1px solid var(--surface);
+    }
+    h3 {
+      font-family: 'Source Serif 4', serif;
+      font-size: 21px;
+      font-weight: 600;
+      margin: 30px 0 12px;
+      color: var(--terracotta);
+    }
+    p { margin-bottom: 16px; }
+    ul, ol { margin: 0 0 16px 24px; }
+    li { margin-bottom: 8px; }
+    .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin: 24px 0; }
+    .card {
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 20px;
+      border-left: 4px solid var(--sage);
+      min-height: 150px;
+    }
+    .card.warn { border-left-color: var(--terracotta); }
+    .card.info { border-left-color: var(--slate); }
+    .card h4 {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+      color: var(--ink-faint);
+    }
+    .card p { margin: 0; font-size: 15.5px; }
+    .badge {
+      display: inline-block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      vertical-align: middle;
+    }
+    .badge.new { background: var(--sage-light); color: var(--sage); }
+    .badge.modify { background: var(--terracotta-light); color: var(--terracotta); }
+    .badge.same { background: var(--slate-light); color: var(--slate); }
+    .step { display: flex; gap: 20px; margin: 20px 0; padding: 22px; background: var(--surface); border-radius: 14px; }
+    .step-num { font-family: 'Playfair Display', serif; font-size: 38px; font-weight: 700; color: var(--terracotta); line-height: 1; min-width: 46px; }
+    .step-body h3 { margin-top: 0; }
+    .step-body p:last-child { margin-bottom: 0; }
+    table { width: 100%; border-collapse: collapse; margin: 24px 0; font-size: 15px; }
+    th { text-align: left; font-family: 'JetBrains Mono', monospace; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: var(--ink-faint); padding: 8px 12px; border-bottom: 2px solid var(--surface); }
+    td { padding: 12px; border-bottom: 1px solid var(--surface); vertical-align: top; }
+    td:first-child { font-family: 'JetBrains Mono', monospace; font-size: 14px; color: var(--terracotta); width: 24%; }
+    code { font-family: 'JetBrains Mono', monospace; font-size: 14px; background: var(--surface); padding: 2px 6px; border-radius: 4px; color: var(--terracotta); }
+    .code-block { background: var(--code-bg); border-radius: 12px; padding: 22px; margin: 24px 0; overflow-x: auto; }
+    .code-block pre { font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.6; color: var(--code-fg); white-space: pre; }
+    blockquote { border-left: 3px solid var(--terracotta); padding: 16px 20px; margin: 24px 0; background: var(--terracotta-light); border-radius: 0 10px 10px 0; font-style: italic; color: var(--ink-light); }
+    blockquote strong { color: var(--ink); font-style: normal; }
+    .diagram { background: var(--surface); border-radius: 14px; padding: 24px; margin: 32px 0; position: relative; overflow-x: auto; }
+    .diagram svg { height: auto; }
+    .diagram .fullscreen-btn { position: absolute; top: 10px; right: 10px; width: 32px; height: 32px; border: 1px solid var(--ink-faint); border-radius: 6px; background: var(--bg); color: var(--ink-light); font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.15s, color 0.15s; z-index: 5; }
+    .diagram .fullscreen-btn:hover { background: var(--terracotta-light); color: var(--terracotta); border-color: var(--terracotta); }
+    .diagram-fullscreen { display: none; position: fixed; inset: 0; z-index: 1000; background: var(--bg); overflow: auto; padding: 60px 40px 40px; }
+    .diagram-fullscreen.active { display: block; }
+    .diagram-fullscreen .back-btn { position: fixed; top: 16px; left: 24px; padding: 8px 16px; border: 1px solid var(--ink-faint); border-radius: 8px; background: var(--bg); color: var(--ink); font-family: 'JetBrains Mono', monospace; font-size: 13px; cursor: pointer; z-index: 1001; }
+    .diagram-fullscreen .back-btn:hover { background: var(--terracotta-light); color: var(--terracotta); border-color: var(--terracotta); }
+    .diagram-fullscreen .diagram-title { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; margin-bottom: 24px; color: var(--ink); text-align: center; }
+    .diagram-fullscreen .diagram-inner { background: var(--surface); border-radius: 12px; padding: 40px; text-align: center; }
+    .divider { border: none; border-top: 1px solid var(--surface); margin: 48px 0; }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin: 24px 0; }
+    .panel { background: var(--surface); border-radius: 14px; padding: 22px; }
+    .panel h3 { margin-top: 0; }
+    .panel.skill { border-top: 5px solid var(--sage); }
+    .panel.cloud { border-top: 5px solid var(--slate); }
+    .callout { background: var(--sage-light); border-radius: 14px; padding: 22px; margin: 24px 0; color: var(--ink-light); }
+    .footer { color: var(--ink-faint); font-size: 14px; }
+    a { color: var(--terracotta); }
+    @media (max-width: 720px) { .page { padding: 36px 20px 90px; } .two-col { grid-template-columns: 1fr; } .step { flex-direction: column; } }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <div class="eyebrow">BAQIS Quafu Skill · Group Meeting Brief</div>
+    <h1>把 Quafu 能力装进用户自己的 AI Agent</h1>
+    <p class="subtitle">这不是一个新的聊天网页，而是一套可安装到 Claude、Codex、opencode、Cursor 等工具里的本地 Agent Skill。它让 agent 在遇到 Quafu / QuarkStudio / QSteed 任务时自动加载正确流程，能配置、写代码、验证，并在真实硬件提交前加安全门。</p>
+
+    <section class="hero-card">
+      <p><strong>一句话：</strong><code>baqis-quafu</code> 是面向 Quafu-SQC / QuarkStudio / QSteed 的跨客户端工作能力包。用户安装后，自己的 coding agent 就会在合适时机触发专门知识和脚本，而不是每次重新问“怎么配置”。</p>
+    </section>
+
+    <h2>谁需要安装？</h2>
+    <div class="card-grid">
+      <article class="card">
+        <h4>量子云用户</h4>
+        <p>想用 Quafu-SQC / QuarkStudio 跑量子云任务，需要 agent 协助写 OpenQASM、构造任务、读取结果。</p>
+      </article>
+      <article class="card info">
+        <h4>开发者 / 教学者</h4>
+        <p>希望 Claude、Codex、opencode、Cursor 都遵守同一套 Quafu 操作规范，而不是每个工具各写一份提示词。</p>
+      </article>
+      <article class="card warn">
+        <h4>安全敏感场景</h4>
+        <p>不希望 API token 被打印、写进源码、进入 LLM 上下文，且真实硬件提交必须先确认。</p>
+      </article>
+      <article class="card">
+        <h4>QSteed 使用者</h4>
+        <p>想在本地用 QSteed 做线路编译 / transpile，并把结果接到 Quafu 工作流里。</p>
+      </article>
+    </div>
+
+    <h2>安装后能提供什么能力？</h2>
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h3>自动触发 <span class="badge new">Skill</span></h3>
+        <p>当用户提到 Quafu、QuarkStudio、QSteed、OpenQASM、backend status、token 配置、任务结果等关键词时，agent 自动加载这套能力包。</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h3>从注册到 token 的安全流程</h3>
+        <p>先确认用户是否已注册 Quafu-SQC；token 只通过 helper 保存到用户本地配置，不复述、不打印、不写入源码。</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h3>写可运行代码，而不是只给说明</h3>
+        <p>生成 QuarkStudio / OpenQASM 任务代码，检查 SDK import，读取 backend status，并为 result retrieval 生成可复用代码。</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <h3>真实硬件提交安全门</h3>
+        <p>调用 <code>tmgr.run(task)</code> 前，必须明确 backend、circuit、shots、options，并得到用户对这一次提交的当前授权。</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-body">
+        <h3>可选 QSteed 能力 <span class="badge modify">Opt-in</span></h3>
+        <p>用户同意后才创建隔离 Python venv，安装已验证版本，运行本地 transpile demo；不碰 token、不联网、不提交硬件。</p>
+      </div>
+    </div>
+
+    <h2>Skill 和“网页里的云端 Agent”有什么区别？</h2>
+    <blockquote><strong>核心区别：</strong>网页云端 Agent 是“用户去访问一个服务”；Agent Skill 是“能力被安装进用户自己的工具”。前者集中托管，后者分发知识、流程和脚本。</blockquote>
+
+    <div class="two-col">
+      <section class="panel skill">
+        <h3>本地 Agent Skill</h3>
+        <ul>
+          <li>安装到用户已有的 Claude / Codex / Cursor / opencode。</li>
+          <li>运行在用户自己的开发环境里，能读写项目文件、运行本地命令。</li>
+          <li>适合“帮我配置、写代码、跑测试、生成任务脚本”。</li>
+          <li>凭证留在用户本地，skill 规定如何保存和避免泄漏。</li>
+          <li>能力可组合：同一个 skill 可被不同 agent 客户端复用。</li>
+        </ul>
+      </section>
+      <section class="panel cloud">
+        <h3>网页里的云端 Agent</h3>
+        <ul>
+          <li>用户访问一个固定网站或聊天入口。</li>
+          <li>后端统一托管模型、工具、会话和权限。</li>
+          <li>适合“平台内问答、在线任务查询、统一产品入口”。</li>
+          <li>凭证和会话通常由云端服务管理，需要服务端安全架构。</li>
+          <li>体验统一，但对用户本地项目和开发环境的操作能力较弱。</li>
+        </ul>
+      </section>
+    </div>
+
+    <div class="diagram" data-diagram data-title="Skill vs Cloud Agent">
+      <button class="fullscreen-btn" title="View fullscreen">&#x26F6;</button>
+      <pre class="mermaid">
+flowchart LR
+    subgraph Local[用户本地开发环境]
+      U[用户] --> A[Claude / Codex / Cursor]
+      A --> S[baqis-quafu Skill]
+      S --> F[项目文件 / OpenQASM / Python 脚本]
+      S --> V[本地 smoke check / QSteed transpile]
+      S --> C[本地 token 存储]
+    end
+    subgraph Cloud[云端 Agent 网站]
+      W[Web Chat UI] --> API[后端 Agent 服务]
+      API --> M[模型与工具路由]
+      API --> P[平台账号 / 会话 / 权限]
+    end
+    S -.授权后.-> Q[Quafu-SQC / QuarkStudio]
+    API -.平台后端调用.-> Q
+    style S fill:#D4E4D6,stroke:#6B8F71
+    style V fill:#D4E4D6,stroke:#6B8F71
+    style C fill:#D4E4D6,stroke:#6B8F71
+    style API fill:#D8DEE4,stroke:#5A6875
+    style M fill:#D8DEE4,stroke:#5A6875
+    style P fill:#D8DEE4,stroke:#5A6875
+    style Q fill:#F2DDD0,stroke:#C47D5A
+      </pre>
+    </div>
+
+    <table>
+      <thead>
+        <tr><th>维度</th><th>baqis-quafu Skill</th><th>云端 Agent 网页</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>交付形态</td><td>可安装的 skill 文件夹：说明、reference、helper scripts。</td><td>一个在线产品入口：Web UI + 后端服务。</td></tr>
+        <tr><td>运行位置</td><td>用户本地 agent 客户端与开发环境。</td><td>平台服务器或云端服务。</td></tr>
+        <tr><td>主要价值</td><td>让 agent 自动做对配置、代码生成、验证和安全提交流程。</td><td>给用户一个统一在线聊天 / 查询 / 任务入口。</td></tr>
+        <tr><td>凭证边界</td><td>token 默认保存在用户本地，不进入 LLM 上下文。</td><td>需要云端账号、会话、权限与服务端凭证治理。</td></tr>
+        <tr><td>本地项目能力</td><td>强：可直接修改项目、运行测试、生成脚本。</td><td>弱到中：取决于是否额外接入代码仓库或远程执行器。</td></tr>
+        <tr><td>适合场景</td><td>科研/教学/开发者要把 Quafu 能力接进现有 coding workflow。</td><td>平台方要提供统一产品体验和在线助手。</td></tr>
+      </tbody>
+    </table>
+
+    <h2>我们在 QSteed 部分做了什么？</h2>
+    <p>QSteed 能力是可选启用的，不会在安装 skill 时默认改用户环境。启用后，agent 会先展示 dry run，再经用户同意创建隔离 venv，安装本机验证过的版本：</p>
+    <div class="code-block"><pre><code>pyquafu==0.4.1
+qsteed==0.2.2
+python helpers/qsteed_smoke.py --check-import --transpile-demo</code></pre></div>
+    <p>这个 smoke check 只做本地 import 和小规模 transpile 验证：不读取 Quafu token、不联网、不提交真实硬件任务。</p>
+
+    <h2>和 quafu.top 的关系与区别</h2>
+    <p>基于此前在 shared-agent / Claude Code 对话中的调研，<code>quafu.top</code> 更像 BAQIS 自研的在线窄域量子助手：有 Web 前端、FastAPI/Starlette 后端、SSE chat、意图路由和工具调用。</p>
+    <p><code>baqis-quafu</code> skill 不是托管服务，也不提供固定网站入口。它是安装到用户本地 agent 的能力包，让用户在自己的开发环境里安全地配置、写代码、验证和调用 Quafu / QSteed。</p>
+
+    <div class="callout">
+      <strong>组会 takeaway：</strong>如果目标是“给所有人一个统一入口”，做云端 Agent；如果目标是“让每个开发者自己的 agent 都会正确使用 Quafu / QSteed”，做 Skill。两者不冲突：云端 Agent 是产品入口，Skill 是开发者工作流能力包。
+    </div>
+
+    <hr class="divider">
+    <p class="footer">Project: <code>quafu-skill</code> · Skill: <code>baqis-quafu</code> · Repository: <a href="https://github.com/NeoFantom/quafu-skill">github.com/NeoFantom/quafu-skill</a></p>
+  </main>
+
+  <div class="diagram-fullscreen" id="fullscreen">
+    <button class="back-btn" id="fullscreen-back">&larr; Back</button>
+    <div class="diagram-title" id="fullscreen-title"></div>
+    <div class="diagram-inner" id="fullscreen-content"></div>
+  </div>
+
+  <script>
+    document.fonts.ready.then(function() {
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: 'base',
+        themeVariables: {
+          primaryColor: '#D4E4D6',
+          primaryTextColor: '#2C2416',
+          primaryBorderColor: '#6B8F71',
+          lineColor: '#8C7E6C',
+          secondaryColor: '#F2DDD0',
+          tertiaryColor: '#D8DEE4',
+          fontFamily: 'Georgia, serif',
+          fontSize: '14px'
+        }
+      });
+      mermaid.run().then(function() { initFullscreen(); });
+    });
+
+    function initFullscreen() {
+      var fullscreen = document.getElementById('fullscreen');
+      var fullscreenTitle = document.getElementById('fullscreen-title');
+      var fullscreenContent = document.getElementById('fullscreen-content');
+      var fullscreenBack = document.getElementById('fullscreen-back');
+
+      document.querySelectorAll('[data-diagram]').forEach(function(container) {
+        var btn = container.querySelector('.fullscreen-btn');
+        if (!btn || btn.dataset.bound) return;
+        btn.dataset.bound = '1';
+        btn.addEventListener('click', function() {
+          var svg = container.querySelector('svg');
+          if (!svg) return;
+          fullscreenTitle.textContent = container.getAttribute('data-title') || 'Diagram';
+          fullscreenContent.innerHTML = svg.outerHTML;
+          fullscreen.classList.add('active');
+          document.body.style.overflow = 'hidden';
+        });
+      });
+
+      fullscreenBack.addEventListener('click', closeFullscreen);
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && fullscreen.classList.contains('active')) closeFullscreen();
+      });
+      function closeFullscreen() {
+        fullscreen.classList.remove('active');
+        fullscreenContent.innerHTML = '';
+        document.body.style.overflow = '';
+      }
+    }
+  </script>
+</body>
+</html>
