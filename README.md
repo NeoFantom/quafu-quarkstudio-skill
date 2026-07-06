@@ -1,14 +1,39 @@
 # Quafu QuarkStudio Skill
 
-Installable Codex skill for QuarkStudio, the BAQIS Quafu-SQC quantum-cloud SDK.
+## 中文安装指南
 
-## One-line install prompt
+复制下面整段给 Codex / ChatGPT agent：
 
-In Codex, say:
+```text
+请帮我安装 Quafu QuarkStudio skill。先询问我语言选择：English | 中文。
+如果我选择 English，请使用 $skill-installer 从这个路径安装：
+https://github.com/NeoFantom/quafu-quarkstudio-skill/tree/main/skills/en/quarkstudio
+如果我选择 中文，请使用 $skill-installer 从这个路径安装：
+https://github.com/NeoFantom/quafu-quarkstudio-skill/tree/main/skills/zh/quarkstudio
+安装完成后，请提醒我重启 Codex 以加载新 skill。
+```
 
-> Use $skill-installer to install the skill from https://github.com/NeoFantom/quafu-quarkstudio-skill/tree/main/quarkstudio
+## English installation guide
 
-Then restart Codex to pick up the new skill.
+Copy the full prompt below into Codex / ChatGPT agent:
+
+```text
+Please install the Quafu QuarkStudio skill for me. First ask me to choose a language: English | 中文.
+If I choose English, use $skill-installer to install from this path:
+https://github.com/NeoFantom/quafu-quarkstudio-skill/tree/main/skills/en/quarkstudio
+If I choose 中文, use $skill-installer to install from this path:
+https://github.com/NeoFantom/quafu-quarkstudio-skill/tree/main/skills/zh/quarkstudio
+After installation, remind me to restart Codex so the new skill is loaded.
+```
+
+## Language-specific skill paths
+
+| Language | GitHub path | Installed skill name |
+|---|---|---|
+| English | `skills/en/quarkstudio` | `$quarkstudio` |
+| 中文 | `skills/zh/quarkstudio` | `$quarkstudio` |
+
+The legacy root path `quarkstudio/` is kept as an English compatibility alias. New installs should use one of the language-specific paths above.
 
 ## What this skill does
 

@@ -1,0 +1,4 @@
+interface:
+  display_name: "QuarkStudio / Quafu"
+  short_description: "Register, configure tokens, and run basic Quafu tasks"
+  default_prompt: "Use $quarkstudio to check my Quafu registration, configure my token safely, and run a read-only QuarkStudio status check."
