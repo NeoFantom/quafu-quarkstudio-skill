@@ -20,9 +20,10 @@ https://neofantom.github.io/quafu-lesson1/assets/screenshots/00-register.png
 用户说注册完成前，不要请求、获取或保存 API token。
 
 3. 如果用户已经注册或刚完成注册，询问他们是否已有 Quafu API token。
-4. 如果用户通过安全输入通道提供 token，不要复述它。立即用 `helpers/store_token.py` 保存。
-5. 如果用户没有 token，询问是否允许打开浏览器并辅助获取。
-6. 用户同意后运行：
+4. 运行 `python3 helpers/capture_token.py`。它先检测 `QUAFU_API_TOKEN` 和已批准的本地凭证文件；若不存在，则直接从本地终端隐藏读取并保存，不把 token 字节放入聊天、model-visible 问答结果、tool 参数或 command 参数。
+5. 如果用户自愿把 token 粘贴到聊天中，绝不复述或引用。明确说明 model 和 transcript 已经收到它，保存操作不能撤销这次暴露。警告后用户可以继续使用该 token。只有 harness 能把已经收到的值通过 stdin 传入且不再次显示或记录时，才运行 `python3 helpers/store_token.py --token-stdin` 并通过 stdin 提供；绝不放入 command 参数或 shell history。建议轮换并使用安全本地采集。如果 harness 无法避免额外日志，不要 replay；运行 `helpers/capture_token.py` 让用户在本地输入替换 token。不要声称聊天表单遮罩或后续本地保存使原始粘贴变成 secret。
+6. 如果用户没有 token，询问是否允许打开浏览器并辅助获取。
+7. 用户同意后运行：
 
 ```bash
 opencli browser quafu-token open https://quafu-sqc.baqis.ac.cn/login
@@ -30,7 +31,7 @@ opencli browser quafu-token open https://quafu-sqc.baqis.ac.cn/login
 
 然后让用户手动登录。不要填写用户名或密码。
 
-7. 用户说已经登录后，取回并保存 token，过程不打印 token：
+8. 用户说已经登录后，取回并保存 token，过程不打印 token：
 
 ```bash
 python helpers/retrieve_token_opencli.py --session quafu-token --store user-env
@@ -68,3 +69,7 @@ QUAFU_API_TOKEN=<redacted-secret-value>
 - 不要把 token 作为可见命令行参数运行；优先用 stdin 或浏览器登录态获取。
 - 不要把整个 secrets dict 传给可能在异常里打印参数的 SDK constructor 或 wrapper。
 - 报告成功时，只说明 token 存在哪里、是否拿到过期时间；永远不要包含 token 值。
+
+## Capability boundary
+
+Agent Skills 没有可移植的 secret-input primitive；其指令会加载到 model context：<https://agentskills.io/specification>。MCP 禁止通过 form elicitation 收集敏感数据，并为 out-of-band secret flow 保留 URL mode：<https://modelcontextprotocol.io/specification/draft/client/elicitation>。因此普通聊天问题、Codex `request_user_input` 和 Claude Code `AskUserQuestion` 和 `omx question` 都必须视为 model-visible，而不是 secret channel；应改用本地终端采集 helper 或外部 browser/OAuth flow。

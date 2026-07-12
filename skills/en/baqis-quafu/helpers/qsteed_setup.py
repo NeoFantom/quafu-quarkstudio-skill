@@ -6,7 +6,6 @@ import argparse
 import os
 import shutil
 import subprocess
-import sys
 from pathlib import Path
 
 QSTEED_PIN = "qsteed==0.2.2"

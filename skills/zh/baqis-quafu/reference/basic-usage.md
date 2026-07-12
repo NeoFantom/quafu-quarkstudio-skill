@@ -53,17 +53,42 @@ captured official docs 说明 `shots` 应为 1024 的整数倍。确认方式：
 4. 如果 QSteed 输出用于 QuarkStudio job 的 OpenQASM，把该 OpenQASM 放入 `task["circuit"]`。
 5. 执行 `tmgr.run(task)` 前仍然必须走普通提交安全门。
 
-## Submission gate
+## 提交策略与受控工作流
 
-`tmgr.run(task)` 会异步提交并返回 task id。它可能消耗真实 QPU quota/credit。运行前必须：
+`tmgr.run(task)` 是可能消耗 quota 的异步云提交。不要直接调用。`helpers/submission_policy.py` 是唯一提交边界，默认策略是 `confirm_each`。
 
-1. 明确说明 backend、circuit 来源/路径、shots、task name、options。
-2. 确认用户现在授权这一次具体提交。
-3. 立即把返回的 `tid` 保存到易恢复的位置，不能只留在聊天上下文。
+### 精确任务确认（默认）
+
+先构造最终 task，再把批准绑定到每个字段：
 
 ```python
-tid = tmgr.run(task)
-print("task id:", tid)  # task id 安全；不是 token
+from helpers.submission_policy import exact_confirmation, submit_authorized
+
+fingerprint = exact_confirmation(task)
+print("exact job fingerprint:", fingerprint)
+# 展示精确 task 摘要，并取得用户现在对该 fingerprint 的明确批准。
+tid = submit_authorized(tmgr, task, exact_approval=fingerprint)
+print("task id:", tid)  # submit_authorized 返回前已经 fsync 持久化
+```
+
+agent 不能把计算或展示 fingerprint 当作批准。backend、circuit、shots、name 或 option 任一变化，都需要新 fingerprint 和新确认。
+
+### 明确的有边界自主模式
+
+只有用户明确 opt-in 后，运行：
+
+```bash
+python3 helpers/submission_policy.py authorize-autonomous \
+  --backend Dongling --max-shots-per-job 4096 --max-jobs 3 \
+  --expires-at '2026-07-13T18:00:00+08:00'
+python3 helpers/submission_policy.py show
+```
+
+之后的有边界流程是：设计范围内 task -> `submit_authorized(tmgr, task)` -> 用 `tmgr.result(tid)` 轮询已保存的 tid -> 分析。每次提交前都检查授权，绝不推断 consent。要立即停止自主模式：
+
+```bash
+python3 helpers/submission_policy.py revoke
+python3 helpers/submission_policy.py show
 ```
 
 ## Result retrieval
@@ -75,3 +100,7 @@ print(res["count"])
 ```
 
 captured official lesson 列出重要结果字段：`count`、`corrected`、`transpiled`、`status`、`tid`、`error`、`finished`、`qlisp`。这个 schema 有来源依据，但仍应在运行时检查实际返回 key。确认方式：`platform-info.md` 汇总的 Quafu-SQC 官方文档快照；置信度：doc snapshot。
+
+## 官方提交语义
+
+Quafu-SQC 官方 Quick Guide 说明：`tmgr.run(task)` 会异步提交任务并立即返回 task ID，`tmgr.result(tid)` 用该 ID 获取结果：<https://quafu-sqc.readthedocs.io/en/latest/#quick-guide>。必须把 `run` 视为真实云提交边界，而不是本地 preview。

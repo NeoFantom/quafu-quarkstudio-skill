@@ -20,9 +20,10 @@ https://neofantom.github.io/quafu-lesson1/assets/screenshots/00-register.png
 Do not ask for, retrieve, or store an API token until the user says registration is complete.
 
 3. If the user is already registered or has just completed registration, ask whether they already have a Quafu API token.
-4. If the user provides or pastes a token into a safe input channel, do not echo it. Store it immediately with `helpers/store_token.py`.
-5. If the user does not have a token, ask for permission to open the browser and help retrieve it.
-6. If approved, run:
+4. Run `python3 helpers/capture_token.py`. It first detects `QUAFU_API_TOKEN` and approved local credential files. If absent, it reads hidden input directly from the local terminal and stores it without placing token bytes in chat, model-visible question results, tool arguments, or command arguments.
+5. If the user voluntarily already pasted a token into chat, never echo or quote it. State plainly that the model and transcript already received it and that storing it cannot undo that exposure. After this warning, the user may continue with that token. Only when the harness can pass the already-received value to stdin without another visible echo or log, invoke `python3 helpers/store_token.py --token-stdin` and supply it through stdin; never put it in command arguments or shell history. Recommend rotation and secure local capture. If the harness cannot avoid additional logging, do not replay the token; run `helpers/capture_token.py` so the user can enter a replacement locally. Do not claim that masking a chat form or later local storage made the original paste secret.
+6. If the user does not have a token, ask for permission to open the browser and help retrieve it.
+7. If approved, run:
 
 ```bash
 opencli browser quafu-token open https://quafu-sqc.baqis.ac.cn/login
@@ -30,7 +31,7 @@ opencli browser quafu-token open https://quafu-sqc.baqis.ac.cn/login
 
 Then tell the user to log in manually. Do not fill username/password yourself.
 
-7. After the user says they are logged in, retrieve and store without printing the token:
+8. After the user says they are logged in, retrieve and store without printing the token:
 
 ```bash
 python helpers/retrieve_token_opencli.py --session quafu-token --store user-env
@@ -68,3 +69,7 @@ in `.env.local` under the selected project root, with file mode `0600`. If the s
 - Do not run commands with the token as a visible command-line argument; prefer stdin or browser retrieval.
 - Do not pass an entire secrets dict to SDK constructors or error-prone wrappers.
 - When reporting success, say where the token was stored and whether an expiration timestamp was available; never include the token value.
+
+## Capability boundary
+
+Agent Skills has no portable secret-input primitive; its instructions are loaded into model context: <https://agentskills.io/specification>. MCP forbids sensitive data in form elicitation and reserves URL mode for out-of-band secret flows: <https://modelcontextprotocol.io/specification/draft/client/elicitation>. Therefore ordinary chat questions, Codex `request_user_input`, and Claude Code `AskUserQuestion`, and `omx question` must be treated as model-visible, not secret channels; use the local terminal capture helper or an external browser/OAuth flow instead.

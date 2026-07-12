@@ -1,3 +1,5 @@
+[中文说明](README.zh.md)
+
 # BAQIS Quafu Skill
 
 Cross-client Agent Skill for Quafu-SQC / QuarkStudio work: account/token setup, safe SDK checks, OpenQASM task code, result retrieval, and optional BAQIS QSteed compile/transpile support.
@@ -12,34 +14,22 @@ The skill is designed so an agent can keep working after installation:
 - write runnable code that loads tokens from approved local storage instead of hard-coding secrets;
 - block real hardware submission until the user authorizes the exact backend/circuit/shots/options.
 
-## Install prompts
+## Install prompt
 
-### Codex / ChatGPT agent
+Language selection is mandatory. The installer must choose exactly one language-specific folder before installing; there is no root-level fallback and no default language.
 
 Copy the full prompt below:
 
 ```text
-Please install the BAQIS Quafu skill for me. First ask me to choose a language: English | 中文.
+Please install the BAQIS Quafu skill for me. I must choose one language before installation: English | 中文. No default language is allowed.
 If I choose English, use $skill-installer to install from this path:
 https://github.com/NeoFantom/quafu-skill/tree/main/skills/en/baqis-quafu
 If I choose 中文, use $skill-installer to install from this path:
 https://github.com/NeoFantom/quafu-skill/tree/main/skills/zh/baqis-quafu
+If I do not choose a language, stop and ask again; do not install a top-level/root baqis-quafu folder.
 If a baqis-quafu skill or legacy quarkstudio skill is already installed locally, ask me before replacing it; do not overwrite silently.
 After installation, run the skill's first-run workflow: ask whether I have registered Quafu-SQC, configure/store my token only through the skill's safe helper, then ask whether I want optional BAQIS QSteed compiler/transpiler support. If I say yes to QSteed, show the helper dry run first and proceed only after I approve package installation and local QSteed config creation.
 After installation, remind me to restart the agent/client if required for skill discovery.
-```
-
-### 中文安装提示
-
-```text
-请帮我安装 BAQIS Quafu skill。先询问我语言选择：English | 中文。
-如果我选择 English，请使用 $skill-installer 从这个路径安装：
-https://github.com/NeoFantom/quafu-skill/tree/main/skills/en/baqis-quafu
-如果我选择 中文，请使用 $skill-installer 从这个路径安装：
-https://github.com/NeoFantom/quafu-skill/tree/main/skills/zh/baqis-quafu
-如果本地已经安装了 baqis-quafu skill 或旧版 quarkstudio skill，请先询问我是否替换；不要静默覆盖。
-安装后运行该 skill 的 first-run workflow：询问我是否已注册 Quafu-SQC；只通过 skill 的安全 helper 配置/保存 token；然后询问我是否要启用北京量子院 BAQIS QSteed 编译/transpiler 支持。如果我选择启用 QSteed，先展示 helper dry run，只有我同意安装包并创建本地 QSteed 配置后再继续。
-安装完成后提醒我按客户端需要重启 agent/client 以加载新 skill。
 ```
 
 ## Client compatibility
@@ -59,7 +49,7 @@ Each skill folder contains both `SKILL.md` and `skill.md`. Keep them synchronize
 | English | `skills/en/baqis-quafu` | `$baqis-quafu` |
 | 中文 | `skills/zh/baqis-quafu` | `$baqis-quafu` |
 
-The root path `baqis-quafu/` is kept as an English compatibility alias. New installs should use one of the language-specific paths above.
+Only the two language-specific paths above are installable. The repository intentionally does not provide a top-level `baqis-quafu/` skill folder because installers must route by explicit language choice.
 
 ## Optional QSteed support
 
@@ -68,6 +58,7 @@ QSteed is opt-in because it installs extra Python packages and may create `~/QSt
 Validated local flow in this repository:
 
 ```bash
+cd skills/en/baqis-quafu  # or: cd skills/zh/baqis-quafu
 python helpers/qsteed_setup.py          # dry run
 python helpers/qsteed_setup.py --yes    # after user approval
 ```

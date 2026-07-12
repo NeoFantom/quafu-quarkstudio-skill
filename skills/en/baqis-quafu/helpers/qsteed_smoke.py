@@ -9,7 +9,6 @@ from __future__ import annotations
 import argparse
 import builtins
 import importlib.metadata
-import sys
 from typing import Iterable
 
 TYPING_SHIM_NAMES = ("List", "Dict", "Tuple", "Union", "Optional")
